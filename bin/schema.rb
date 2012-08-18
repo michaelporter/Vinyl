@@ -1,3 +1,5 @@
+Dir[File.dirname(__FILE__) + '/../db/migrate/*.rb'].each {|file| require file}
+
 require 'lib/populator.rb'
 
 db = SQLite3::Database.open("my_new_records.db")
@@ -21,13 +23,15 @@ db.execute("create table if not exists genre_mappings (
 db.execute("create table if not exists artist_groups (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name VARCHAR(100),
-            description TEXT(1000)
+            description TEXT(1000),
+            UNIQUE (name)
           )")
 
 db.execute("create table if not exists artist_individuals (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name VARCHAR(50),
-            description TEXT(1000)
+            description TEXT(1000),
+            UNIQUE (name)
           )")
 
 db.execute("create table if not exists artist_group_connections (
@@ -36,35 +40,6 @@ db.execute("create table if not exists artist_group_connections (
             artist_id INTEGER
           )")
 
-
-
-db.execute("create table if not exists genres (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name VARCHAR(100),
-            description TEXT(1000)
-          )")
-populate = Populator.new(db, 'genres')
-new_genres = [
-      {:name => 'Rock', :description => 'Rock'},
-      {:name => "Pop", :description => "Pop"},
-      {:name => "Country", :description => "Country"},
-      {:name => "Southern", :description => "Southern"},
-      {:name => "Jazz", :description => "Jazz"},
-      {:name => "Fusion", :description => "Fusion"},
-      {:name => "Progressive", :description => "Progressive"},
-      {:name => "Indie", :description => "Indie"},
-      {:name => "Blues", :description => "Blues"},
-      {:name => "Techno", :description => "Techno"},
-      {:name => "Disco", :description => "Disco"},
-      {:name => "Electronic", :description => "Electronic"},
-      {:name => "Metal", :description => "Metal"},
-      {:name => "Classical", :description => "Classical music"}
-    ]
-begin
-  new_genres.each { |genre| populate.add(genre) }
-  populate.update({:name => 'Rock', :description => 'hey man'})
-rescue
-  "Something went wronge when populating genre table"
-end
-
+genres = CreateGenres.new(db)
+genres.down
 }.call

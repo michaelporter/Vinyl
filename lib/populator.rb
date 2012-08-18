@@ -6,58 +6,62 @@ class Populator
   end
 
   def add(value_pairs)  # these methods will need far better error handling
-      result = @db.execute("select * from #{@table} where #{value_pairs.keys.join('= ? and ')} = ?", value_pairs.values)
-      if result.length == 0
-        @db.execute("insert into #{@table} (#{value_pairs.keys.join(', ')}) VALUES (#{value_pairs.values.map {|x| '\''+x.to_s+'\''  }.join(',')})")
+      result = ""
+      rescue_me do
+        result = @db.execute("select * from #{@table} where #{value_pairs.keys.join('= ? and ')} = ?", value_pairs.values)
+        if result.length < 1
+          puts value_pairs.inspect
+          @db.execute("insert into #{@table} (#{value_pairs.keys.join(', ')}) VALUES (#{value_pairs.values.map {|x| '\''+x.to_s+'\''  }.join(',')})")
+        end
+        value_pairs
       end
   end
 
   def update(value_pairs)
-    begin
+    result = ""
+    rescue_me do
       puts "checking...."
       result = @db.execute("select * from #{@table} where name = ?", value_pairs[:name])
       puts "checked"
-    rescue => exception
-      puts exception
-      puts exception.backtrace
     end
 
-  if result.length > 0
+
+    if result.length > 0
+      rescue_me do
+        puts "trying..."
+        stmt = @db.prepare("update #{@table} SET #{value_pairs.keys.join(' = ?, ')} = ? WHERE name = '#{value_pairs[:name]}'")
+        stmt.bind_params(value_pairs.values)
+        stmt.execute
+        puts "updated!"
+      end
+    end
+  end
+
+  def delete_these(value_pairs)
+    result = ""
+    rescue_me do
+      puts "checking...."
+      result = @db.execute("select * from #{@table} where name = ?", value_pairs[:name])
+      puts "checked"
+    end
+
+    if result.length > 0
+      rescue_me do
+        puts "deleting..."
+        stmt = @db.prepare("delete from #{@table} WHERE #{value_pairs.keys.join(' = ? and ')} = ?")
+        stmt.bind_params(value_pairs.values)
+        stmt.execute
+        puts "deleted!"
+      end
+    end
+  end
+
+  def rescue_me(&block)
     begin
-      puts "trying..."
-      stmt = @db.prepare("update #{@table} SET #{value_pairs.keys.join(' = ?, ')} = ? WHERE name = '#{value_pairs[:name]}'")
-      stmt.bind_params(value_pairs.values)
-      stmt.execute
-      puts "updated!"
-    rescue => exception
-      puts exception
-      puts exception.backtrace
+      vals = yield if block_given?
+    rescue => e
+      puts "Error! #{e} : #{vals.inspect}"
+      puts e.backtrace
     end
   end
-
-
-  end
-
-  def split_vals(vals)
-    ar = []
-    until vals.index(', ') == nil do
-      place = vals.index(', ')
-      ar << vals.slice!(0, place)
-      vals.slice!(0,2)
-    end  
-    ar << vals.slice!(0, vals.length)
-    ar.map{|x| '\''+x+'\''}.join(', ')  # returns " 'val', 'val2' "
-  end
-
-  def split_vals(val_array)
-    i = 0
-    val_array.length.times do
-      instance_variable_set("@var#{i}", val_array[i])
-      i = i+1
-    end
-    return #what exactly?  To a bind_params argument, likely; can it be an array?
-  end
-
-
-
 end

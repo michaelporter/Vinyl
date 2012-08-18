@@ -4,6 +4,7 @@ $: << File.join(File.dirname(__FILE__), "/..")
 
 require 'lib/album.rb'
 require 'lib/collection.rb'
+require 'lib/migration.rb'
 require 'bin/schema.rb'
 
 
