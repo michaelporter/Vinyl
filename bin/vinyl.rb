@@ -3,51 +3,48 @@
 $: << File.join(File.dirname(__FILE__), "/..")
 
 require 'lib/album.rb'
-require 'lib/collection.rb'
+require 'lib/artist_solo.rb'
+require 'lib/artist_group.rb'
 require 'lib/migration.rb'
 require 'bin/schema.rb'
 
+db = SQLite3::Database.open("my_new_records.db")  # maybe a global here would be worth it
+Album.set_db(db)
+Artist.set_db(db)
 
-# this file will contain the main program route, and draw from the other files for support
-
-
-# CLI stuffs
-
-db = SQLite3::Database.new("my_new_records.db")
-
-#db.execute("create table records (
-#            title varchar(30),
-#            artist varchar(30),
-#            year  integer(4),
-#            genre varchar2(3)
-#         )")
-
-r = Album.new(:title => "Abbey Road", :artist => "The Beatles", :year => 1969, :genre => "Rock/Pop")
-q = Album.new(:title => "Electric Ladyland", :artist => "Jimi Hendrix", :year => 1969, :genre => "Rock")
-
-#db.execute("insert into albums (title, artist, year, genre) VALUES ('#{r.title}', '#{r.artist}', '#{r.year}', '#{r.genre}');")
-#db.execute("insert into albums (title, artist, year, genre) VALUES ('#{q.title}', '#{q.artist}', '#{q.year}', '#{q.genre}');")
-=begin
-rows = db.execute2("select * from records");
-columns = rows.shift
-i=0
-hs = []
-rows.each do |row|
-  col = {}
-  row.each do |item|
-    col["#{columns[i]}".to_sym] = item
-    i = i+1
-  end
-  hs.push col
-  i = 0
+def clear_args(steps)
+  ARGV.shift(steps)
 end
 
+#puts ARGV.inspect
+res = {}
 
+case ARGV[0]
+when "new"
 
-puts hs
-=end
+  case ARGV[1]
+  when "album"
+    clear_args(2) # allows for gets by clearing the ARGV tray, as it were
+    res = Album.get_new
+    album = Album.new(res)
+    album.save!
+  when "artist"
+    clear_args(2)
+    type = ""
+    until ["solo", "group"].include? type
+      puts "solo or group?"
+      type = gets.chomp
+    end
 
-#rows = db.execute("select * from genres")
-#rows.each do |row|
-#  puts row
-#end
+    case type
+    when "solo"
+      res = ArtistSolo.get_new
+      artist = ArtistSolo.new(res)
+      artist.save!
+    when "group"
+      res = ArtistGroup.get_new
+      artist = ArtistGroup.new(res)
+      artist.save!
+    end # internal ARGV for solo vs group artist
+  end # second ARGV ("album", "artist", etc)
+end # first ARGV ("new", "remove", "rm", etc)

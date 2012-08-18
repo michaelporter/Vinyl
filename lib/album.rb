@@ -1,13 +1,5 @@
-#!/usr/bin/ruby
-
 require 'rubygems'
 require 'sqlite3'
-
-# This file will store the Record class, which will create new records
-# How will I know which database to use?
-#   would a class method for Record do the job?  It could be changed from outside record, correct?  
-#        if not, there could be a class method for that 
-
 
 class Album
 
@@ -20,15 +12,30 @@ class Album
     record.each_pair do |key, value|
       me.instance_variable_set("@#{key}", value)
     end
-  end      
+  end
+
+  def self.get_new
+    res = {}
+    puts "Title:"
+      res[:title] = gets.chomp
+    puts "Arist:"
+      res[:artist] = gets.chomp
+    puts "Year: "
+      res[:year] = gets.chomp
+
+    res
+  end
+
+  def self.set_db(db)
+    @@db = db
+  end
+
+  def db
+    @@db
+  end
 
   def save!
-    # code to store the instance variables in the database;
-    # should check if there is a column for the variable, and if there is, store the value there;
-    # consider creating new columns, but probably decide against it;
-    # return false if fails
-    
-    # also, print out the saved record?
+    db.execute("insert into albums (title, artist, year) VALUES (?,?,?)", title, artist, year)
   end
  
   def update!

@@ -18,42 +18,26 @@ class Populator
   end
 
   def update(value_pairs)
-    result = ""
-    rescue_me do
-      puts "checking...."
-      result = @db.execute("select * from #{@table} where name = ?", value_pairs[:name])
-      puts "checked"
-    end
-
-
-    if result.length > 0
+    if exists_by_name? value_pairs
       rescue_me do
-        puts "trying..."
+
         stmt = @db.prepare("update #{@table} SET #{value_pairs.keys.join(' = ?, ')} = ? WHERE name = '#{value_pairs[:name]}'")
         stmt.bind_params(value_pairs.values)
         stmt.execute
+
         puts "Updated! " + value_pairs.inspect
-        puts "updated!"
       end
     end
   end
 
   def delete_these(value_pairs)
-    result = ""
-    rescue_me do
-      puts "checking...."
-      result = @db.execute("select * from #{@table} where name = ?", value_pairs[:name])
-      puts "checked"
-    end
 
-    if result.length > 0
+    if exists_by_name? value_pairs
       rescue_me do
-        puts "deleting..."
         stmt = @db.prepare("delete from #{@table} WHERE #{value_pairs.keys.join(' = ? and ')} = ?")
         stmt.bind_params(value_pairs.values)
         stmt.execute
         puts "Deleted! " + value_pairs.inspect
-        puts "deleted!"
       end
     end
   end
@@ -66,4 +50,13 @@ class Populator
       puts e.backtrace
     end
   end
+
+  def exists_by_name?(pair)
+    result = ""
+    rescue_me do
+      result = @db.execute("select * from #{@table} where name = ?", pair[:name])
+    end
+    result > 0
+  end
+  
 end
