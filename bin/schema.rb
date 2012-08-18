@@ -62,7 +62,7 @@ new_genres = [
     ]
 begin
   new_genres.each { |genre| populate.add(genre) }
-  populate.update({:name => 'Rock', :description => 'New Description'})
+  populate.update({:name => 'Rock', :description => 'hey man'})
 rescue
   "Something went wronge when populating genre table"
 end
