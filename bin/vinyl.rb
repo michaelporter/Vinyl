@@ -16,19 +16,18 @@ def clear_args(steps)
   ARGV.shift(steps)
 end
 
-#puts ARGV.inspect
 res = {}
 
 case ARGV[0]
-when "new"
+when "new", "New", "Add", "add"
 
   case ARGV[1]
-  when "album"
+  when /album/i, /record/i
     clear_args(2) # allows for gets by clearing the ARGV tray, as it were
     res = Album.get_new
     album = Album.new(res)
     album.save!
-  when "artist"
+  when /artist/i, /band/i, 
     clear_args(2)
     type = ""
     until ["solo", "group"].include? type
@@ -37,14 +36,14 @@ when "new"
     end
 
     case type
-    when "solo"
-      res = ArtistSolo.get_new
+    when /solo/i
+      res = ArtistSolo.get_new    # these can be combined, keeping them separate only for now
       artist = ArtistSolo.new(res)
       artist.save!
-    when "group"
+    when /group/i
       res = ArtistGroup.get_new
       artist = ArtistGroup.new(res)
       artist.save!
-    end # internal ARGV for solo vs group artist
-  end # second ARGV ("album", "artist", etc)
-end # first ARGV ("new", "remove", "rm", etc)
+    end # solo, group
+  end # album, artist, etc
+end # new, remove, rm, etc

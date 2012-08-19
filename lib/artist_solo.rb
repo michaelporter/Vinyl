@@ -30,6 +30,4 @@ class ArtistSolo < Artist
     @vals
   end
 
-
-
 end
