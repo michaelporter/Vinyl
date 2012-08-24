@@ -46,4 +46,12 @@ when "new", "New", "Add", "add"
       artist.save!
     end # solo, group
   end # album, artist, etc
+when "change", "update"
+  case ARGV[1]
+  when /artist/i
+    clear_args(2)
+    puts "Name:"
+    artist = gets
+    artist = ArtistSolo.find_by_name(artist)
+  end
 end # new, remove, rm, etc

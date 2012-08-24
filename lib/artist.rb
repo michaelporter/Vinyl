@@ -8,6 +8,10 @@ class Artist
     end
   end
 
+  def db
+    @@db
+  end
+
   def save!
     puts "Saved!"
   end
@@ -25,10 +29,31 @@ class Artist
     res
   end
 
-  def db
-    @@db
+  def self.find_by_name(name)
+    result = ""
+  
+    # How to keep distinct the band and solo artist names
+    
+    begin
+    stmt = @@db.prepare("select * from 'artist_solos' where first_name=? LIMIT 0,1")
+    stmt.bind_params(name)
+    result = stmt.execute
+    rescue=> e
+      puts e
+      puts e.backtrace
+    end
+
+    if result.length - 1 # does not work
+      begin
+      stmt = @@db.prepare("select * from 'artist_groups' where name=? LIMIT 0,1")
+      stmt.bind_params(name)
+      result = stmt.execute
+      rescue=> e
+        puts e
+        puts e.backtrace
+      end
+    end
+    result
   end
-
-
 
 end
