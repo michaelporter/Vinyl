@@ -7,7 +7,11 @@ require 'lib/artist_solo.rb'
 require 'lib/artist_group.rb'
 require 'lib/menu.rb'
 require 'lib/migration.rb'
+require 'lib/utility.rb'
 require 'bin/schema.rb'
+
+include Menu
+include Utility
 
 db = SQLite3::Database.open("my_new_records.db")  # maybe a global here would be worth it
 Album.set_db(db)
@@ -17,10 +21,11 @@ res = {}
 
 case ARGV[0]
 when "new", "New", "Add", "add"
-  new_stuff(ARGV)
+  terminator { new_stuff(ARGV) }
 when "change", "update"
-  update_stuff(ARGV)
+  terminator { update_stuff(ARGV) }
+when "find"
+  terminator { find_stuff(ARGV) }
 else
-  prompt_menu
-  Process.exit
+  terminator { prompt_menu }
 end # new, remove, rm, etc

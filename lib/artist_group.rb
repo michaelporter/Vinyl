@@ -1,4 +1,8 @@
+require 'lib/artist.rb'
+require 'lib/utility.rb'
+
 class ArtistGroup < Artist
+  extend Utility::Model
 
   def initialize(res)
     @vals = res
@@ -24,6 +28,16 @@ class ArtistGroup < Artist
     puts "Decription:"
     @vals[:description] = gets.chomp
     @vals
+  end
+
+  def self.find_by_name(name)
+    # sanitize input of quotes, etc
+    query = @@db.prepare("select * from 'artist_groups' where name = '#{name}' LIMIT 0,1")
+    result = super(query)
+    artist = [:id, :name, :description]
+
+    artist = ArtistGroup.new(wrap_result(artist, result))
+    puts artist.inspect
   end
 
 end

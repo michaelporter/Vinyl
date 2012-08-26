@@ -3,8 +3,9 @@ class Artist
   def initialize(value_hash)
     me = self
     record = value_hash
-    record.each_pair do |key, value|
-      me.instance_variable_set("@#{key}", value)
+    record.each_pair do |key, value|              # doesn't make sense to be this flexible 
+      me.instance_variable_set("@#{key}", value)  # in the actual models, but this cuts down
+      me.class.send("attr_accessor", key)         # on their overhead; value checking falls on them
     end
   end
 
@@ -29,30 +30,12 @@ class Artist
     res
   end
 
-  def self.find_by_name(name)
+  def self.find_by_name(query)
     result = ""
-  
-    # How to keep distinct the band and solo artist names
-    
-    begin
-    stmt = @@db.prepare("select * from 'artist_solos' where first_name=? LIMIT 0,1")
-    stmt.bind_params(name)
-    result = stmt.execute
-    rescue=> e
-      puts e
-      puts e.backtrace
-    end
 
-    if result.length - 1 # does not work
-      begin
-      stmt = @@db.prepare("select * from 'artist_groups' where name=? LIMIT 0,1")
-      stmt.bind_params(name)
-      result = stmt.execute
-      rescue=> e
-        puts e
-        puts e.backtrace
-      end
-    end
+    stmt = query
+    result = stmt.execute rescue e.backtrace
+
     result
   end
 

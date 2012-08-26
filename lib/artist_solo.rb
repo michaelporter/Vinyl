@@ -1,6 +1,8 @@
 require 'lib/artist.rb'
+require 'lib/utility.rb'
 
 class ArtistSolo < Artist
+  extend Utility::Model
 
   def initialize(res)
     @vals = res
@@ -43,9 +45,13 @@ class ArtistSolo < Artist
     @vals
   end
 
-  def self.find_by_name(name)
-    result = super
-    puts result.inspect
+  def self.find_by_name(first_name, last_name)
+    # sanitize input of quotes, etc
+    query = @@db.prepare("select * from 'artist_solos' where first_name = '#{first_name}' and last_name = '#{last_name}' LIMIT 0,1")
+    result = super(query)
+    artist = [:id, :first_name, :last_name, :description]
+
+    artist = ArtistSolo.new(wrap_result(artist, result))
   end
 
 end
