@@ -13,21 +13,27 @@ class Artist
     @@db
   end
 
-  def save!
+  def save!(query)
+    begin
+      query.execute
+    rescue => e
+      puts e
+      puts e.backtrace
+    end
     puts "Saved!"
+  end
+
+  def update(query)
+    begin
+      query.execute
+    rescue => e
+      puts e
+      puts e.backtrace
+    end
   end
 
   def self.set_db(db)
     @@db = db
-  end
-
-  def self.get_new
-    res = {}
-    puts "Name:"
-    res[:name] = gets.chomp
-    puts "Decription:"
-    res[:description] = gets.chomp
-    res
   end
 
   def self.find_by_name(query)

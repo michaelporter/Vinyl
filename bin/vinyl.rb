@@ -28,4 +28,4 @@ when "find"
   terminator { find_stuff(ARGV) }
 else
   terminator { prompt_menu }
-end # new, remove, rm, etc
+end

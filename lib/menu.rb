@@ -71,22 +71,27 @@ module Menu
     argv ||= ARGV
 
     case ARGV[1]
-    when "artist"
+    when /artist/i
       clear_args
       puts "solo or group"
       res = gets.chomp
       case res
-      when "solo"
+      when /solo/i
         puts "First name:"
         first = gets.chomp
         puts "Last name:"
         last = gets.chomp
         ArtistSolo.find_by_name(first, last)
-      else
+      when /group/i
         puts "Name:"
         name = gets.chomp
         ArtistGroup.find_by_name(name)
       end
+    when /album/i
+      clear_args
+      puts "Title:"
+      title = gets.chomp
+      Album.find_by_title(title)
     end
   end
 end

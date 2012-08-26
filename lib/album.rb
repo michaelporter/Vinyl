@@ -1,7 +1,9 @@
 require 'rubygems'
 require 'sqlite3'
+require 'lib/utility.rb'
 
 class Album
+  extend Utility::Model
 
   attr_accessor :title, :artist, :year, :genre  # this will need to map to the correct values;
                                                 # depends on how the object will be mapped from the database
@@ -11,6 +13,7 @@ class Album
     record = value_hash
     record.each_pair do |key, value|
       me.instance_variable_set("@#{key}", value)
+      me.class.send("attr_accessor", key) 
     end
   end
 
@@ -52,8 +55,14 @@ class Album
     # shows the record's information in a an attractive way
   end
 
-  def find_by_title(title)
-    # searches db for record, returns record or false
+  def self.find_by_title(title)
+    stmt = @@db.prepare("select * from 'albums' WHERE title='#{title}' LIMIT 0,1")
+    result = stmt.execute rescue e.backtrace
+
+    album = [:id, :title, :artist, :year]
+
+    album = Album.new(wrap_result(album, result))
+    puts album.inspect
   end
 
   def find_by_artist(artist)

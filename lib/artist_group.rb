@@ -10,15 +10,15 @@ class ArtistGroup < Artist
   end
 
   def save!
-    begin
-      stmt = db.prepare("insert into 'artist_groups' (name, description) VALUES (?, ?)")
-      stmt.bind_params(@vals[:name], @vals[:description])
-      stmt.execute
-    rescue => e
-      puts e
-      puts e.backtrace
-    end
-    super
+    stmt = db.prepare("insert into 'artist_groups' (name, description) VALUES (?, ?)")
+    stmt.bind_params(@vals[:name], @vals[:description])
+    super(stmt)
+  end
+
+  def update # needs to find the where
+    stmt = db.prepare("update 'artist_groups' SET name=?, description=?)")
+    stmt.bind_params(self.first_name, self.last_name, self.description)
+    super(stmt)
   end
 
   def self.get_new  # not sure this makes sense anymore
@@ -30,8 +30,7 @@ class ArtistGroup < Artist
     @vals
   end
 
-  def self.find_by_name(name)
-    # sanitize input of quotes, etc
+  def self.find_by_name(name) # sanitize input of quotes, etc
     query = @@db.prepare("select * from 'artist_groups' where name = '#{name}' LIMIT 0,1")
     result = super(query)
     artist = [:id, :name, :description]
@@ -39,5 +38,4 @@ class ArtistGroup < Artist
     artist = ArtistGroup.new(wrap_result(artist, result))
     puts artist.inspect
   end
-
 end
