@@ -4,24 +4,25 @@ require 'bin/vinyl.rb'
 require 'lib/populator.rb'
 require 'lib/migration.rb'
 
-#db = SQLite3::Database.open("my_new_records.db")
-#Migration.set_db(db)
-
-
-def migrate
-  lambda {
+module Migrations # not being included properly; might want to just go for a rake task
+                  # to speed through the files; would require a timestamp-like thing, though
+  def migrate
+    db = SQLite3::Database.open("my_vinyl.db")
+    Migration.set_db(db)
+    lambda {
   
-    CreateAlbums.up
+      CreateAlbums.up
   
-    CreateGenreMappings.up
+      CreateGenreMappings.up
   
-    CreateArtistGroups.up
+      CreateArtistGroups.up
     
-    CreateArtistSolos.up
+      CreateArtistSolos.up
   
-    CreateGenres.up
+      CreateGenres.up
   
-    PopulateGenres.up
+      PopulateGenres.up
   
-  }.call
+    }.call
+  end
 end

@@ -35,7 +35,7 @@ module Menu
       res = Album.get_new
       album = Album.new(res)
       album.save!
-    when /artist/i, /band/i, 
+    when /artist/i, /band/i
       clear_args
       type = ""
       until ["solo", "group"].include? type
@@ -62,7 +62,7 @@ module Menu
     when /artist/i
       clear_args
       puts "Name:"
-      artist = gets
+      artist = gets #.chomp?
       artist = ArtistSolo.find_by_name(artist)
     end
   end

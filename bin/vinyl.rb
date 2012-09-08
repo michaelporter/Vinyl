@@ -13,7 +13,7 @@ require 'bin/schema.rb'
 include Menu
 include Utility
 
-db = SQLite3::Database.open("my_new_records.db")  # maybe a global here would be worth it
+db = SQLite3::Database.open("my_vinyl.db")  # maybe a global here would be worth it
 Album.set_db(db)
 Artist.set_db(db)
 
@@ -26,6 +26,8 @@ when "change", "update"
   terminator { update_stuff(ARGV) }
 when "find"
   terminator { find_stuff(ARGV) }
+when "migrate"
+  terminator { migrate }
 else
   terminator { prompt_menu }
 end
