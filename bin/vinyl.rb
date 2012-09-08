@@ -2,16 +2,16 @@
 
 $: << File.join(File.dirname(__FILE__), "/..")
 
-require 'lib/album.rb'
-require 'lib/artist_solo.rb'
-require 'lib/artist_group.rb'
-require 'lib/menu.rb'
-require 'lib/migration.rb'
-require 'lib/utility.rb'
-require 'bin/schema.rb'
+require 'lib/vinyl/album.rb'
+require 'lib/vinyl/artist_solo.rb'
+require 'lib/vinyl/artist_group.rb'
+require 'lib/vinyl/menu.rb'
+require 'lib/vinyl/migration.rb'
+require 'lib/vinyl/utility.rb'
+require 'lib/vinyl/database_operations.rb'
 
 include Menu
-include Utility
+include Utility::CommandTools
 
 db = SQLite3::Database.open("my_vinyl.db")  # maybe a global here would be worth it
 Album.set_db(db)
@@ -27,7 +27,7 @@ when "change", "update"
 when "find"
   terminator { find_stuff(ARGV) }
 when "migrate"
-  terminator { migrate }
+  terminator { DatabaseOperations::migrate }
 else
   terminator { prompt_menu }
 end

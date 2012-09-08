@@ -1,4 +1,4 @@
-Dir[File.dirname(__FILE__) + '/../lib/migration.rb'].each {|file| require file}
+Dir[File.dirname(__FILE__) + '/../lib/vinyl/migration.rb'].each {|file| require file}
 
 class CreateArtistSolos < Migration
   def self.up

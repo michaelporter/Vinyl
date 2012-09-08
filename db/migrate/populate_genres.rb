@@ -1,5 +1,4 @@
-Dir[File.dirname(__FILE__) + '/../../lib/migration.rb'].each {|file| require file}
-#Dir[File.dirname(__FILE__) + '/../../lib/populator.rb'].each {|file| require file}
+Dir[File.dirname(__FILE__) + '/../../lib/vinyl/migration.rb'].each {|file| require file}
 
 class PopulateGenres < Migration
 
@@ -24,7 +23,7 @@ class PopulateGenres < Migration
     end
 
     def up
-      populate = populator('genres')  # db is set in Migration
+      populate = populator('genres')  # sets table; db is set in Migration
 
       begin
         new_genres.each { |genre| populate.add(genre) }
