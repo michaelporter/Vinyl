@@ -28,6 +28,9 @@ when "find"
   terminator { find_stuff(ARGV) }
 when "migrate"
   terminator { DatabaseOperations::migrate }
+when /\w+/i  # be able to simply type in a name and return search results; if artists are found, returns information about them
+  puts ARGV.inspect
+  Process.exit
 else
   terminator { prompt_menu }
 end
